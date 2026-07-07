@@ -5,13 +5,19 @@ on:
     branches: [ "main" ]
 
 jobs:
-  test-dan-deploy:
+  deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Ambil kode dari GitHub
         uses: actions/checkout@v4
 
-      - name: Cek apakah kode bisa di-build (CI)
-        run: |
-          docker build -t sistem-logistik:latest .
-          echo "✅ CI Sukses: Kode berhasil dirakit!"
+      - name: Kirim kode ke Server & Update Aplikasi
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd ~/sistem-logistik-api
+            git pull origin main
+            sudo docker compose up -d --build
