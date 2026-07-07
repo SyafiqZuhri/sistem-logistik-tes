@@ -1,4 +1,17 @@
-- name: Deploy Aplikasi
+name: CI/CD Pipeline Anteraja
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ambil kode dari GitHub
+        uses: actions/checkout@v4
+
+      - name: Kirim kode ke Server & Update Aplikasi
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.SSH_HOST }}
@@ -6,6 +19,7 @@
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             cd ~/sistem-logistik-api
+            git reset --hard origin/main
             git pull origin main
             sudo docker compose down
             sudo docker compose up -d --build
