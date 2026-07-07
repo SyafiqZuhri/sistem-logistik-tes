@@ -1,0 +1,17 @@
+name: CI/CD Pipeline Anteraja
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  test-dan-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ambil kode dari GitHub
+        uses: actions/checkout@v4
+
+      - name: Cek apakah kode bisa di-build (CI)
+        run: |
+          docker build -t sistem-logistik:latest .
+          echo "✅ CI Sukses: Kode berhasil dirakit!"
