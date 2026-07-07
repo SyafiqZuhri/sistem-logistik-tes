@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Logistik Anteraja</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; padding: 20px; margin: 0; }
+        .container { max-width: 800px; margin: auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 8px 16px rgba(0,0,0,0.1); }
+        h1 { color: #e65100; text-align: center; border-bottom: 2px solid #ffcc80; padding-bottom: 10px; margin-bottom: 30px; }
+        .card { border: 1px solid #e0e0e0; padding: 20px; margin-bottom: 25px; border-radius: 8px; background-color: #fafafa; border-left: 5px solid #e65100; }
+        h3 { margin-top: 0; color: #333; }
+        input, button { padding: 12px; margin: 8px 0; width: 100%; box-sizing: border-box; border: 1px solid #ccc; border-radius: 6px; font-size: 16px; }
+        button { background-color: #e65100; color: white; border: none; cursor: pointer; font-weight: bold; transition: 0.3s; }
+        button:hover { background-color: #bf360c; }
+        pre { background: #263238; color: #80cbc4; padding: 15px; overflow-x: auto; border-radius: 6px; font-size: 14px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📦 Portal Logistik Anteraja</h1>
+        
+        <div class="card">
+            <h3>🔍 1. Cek Resi (Pelanggan)</h3>
+            <input type="text" id="cekResiInput" placeholder="Masukkan Nomor Resi (misal: ANTRJ001)">
+            <button onclick="cekResi()">Lacak Paket</button>
+            <pre id="hasilCek">Status paket akan muncul di sini...</pre>
+        </div>
+
+        <div class="card">
+            <h3>📝 2. Pendaftaran Resi Baru (Admin Gudang)</h3>
+            <input type="text" id="buatResi" placeholder="Nomor Resi Baru (misal: ANTRJ002)">
+            <input type="text" id="pengirim" placeholder="Nama Pengirim">
+            <input type="text" id="penerima" placeholder="Nama Penerima">
+            <button onclick="buatResi()">Daftarkan Paket</button>
+        </div>
+
+        <div class="card">
+            <h3>🚚 3. Update Status Pengiriman (Kurir)</h3>
+            <input type="text" id="updateResi" placeholder="Nomor Resi yang dibawa">
+            <input type="text" id="statusBaru" placeholder="Status Baru (misal: Sedang diantar ke tujuan)">
+            <button onclick="updateResi()">Update Status</button>
+        </div>
+    </div>
+
+    <script>
+        async function cekResi() {
+            const resi = document.getElementById('cekResiInput').value;
+            if (!resi) return alert("Masukkan nomor resi!");
+            const res = await fetch('/resi/' + resi);
+            const data = await res.json();
+            document.getElementById('hasilCek').innerText = JSON.stringify(data, null, 2);
+        }
+        
+        async function buatResi() {
+            const no_resi = document.getElementById('buatResi').value;
+            const pengirim = document.getElementById('pengirim').value;
+            const penerima = document.getElementById('penerima').value;
+            if (!no_resi || !pengirim || !penerima) return alert("Semua kolom harus diisi!");
+            const res = await fetch('/resi', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ no_resi, pengirim, penerima })
+            });
+            const data = await res.json();
+            alert(data.message || data.error);
+        }
+        
+        async function updateResi() {
+            const id = document.getElementById('updateResi').value;
+            const status_baru = document.getElementById('statusBaru').value;
+            if (!id || !status_baru) return alert("Nomor resi dan status baru wajib diisi!");
+            const res = await fetch('/resi/' + id, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ status_baru })
+            });
+            const data = await res.json();
+            alert(data.message || data.error);
+        }
+    </script>
+</body>
+</html>

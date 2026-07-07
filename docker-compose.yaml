@@ -1,0 +1,14 @@
+services:
+  database-redis:
+    image: redis:alpine
+    container_name: database-redis
+
+  web-api:
+    build: .
+    container_name: web-api
+    ports:
+      - "8080:8080"
+    depends_on:
+      - database-redis
+    environment:
+      - REDIS_URL=redis://database-redis:6379
